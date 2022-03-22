@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "141005754803",
+    "project_id": "hey-dentist",
+    "storage_bucket": "hey-dentist.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:141005754803:android:b8d65186f6d3995b27fbc6",
+        "android_client_info": {
+          "package_name": "com.example.hey_dentist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "141005754803-505ert87vqu5ed8qt493f27oon323e5m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEU6xeFUE8NYuqAErLHilnT8cm9XhEh54"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "141005754803-505ert87vqu5ed8qt493f27oon323e5m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
