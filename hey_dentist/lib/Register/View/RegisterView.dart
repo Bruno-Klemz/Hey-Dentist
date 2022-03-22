@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hey_dentist/Login/BLoC/LoginBloc.dart';
-import 'package:hey_dentist/Login/BLoC/LoginState.dart';
+import 'package:hey_dentist/Register/BLoC/RegisterBloc.dart';
 
-import '../BLoC/LoginEvent.dart';
+import '../BLoC/RegisterEvent.dart';
+import '../BLoC/RegisterState.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({Key? key}) : super(key: key);
-  final layoutConstrains = LoginLayoutConstrains();
+class RegisterPage extends StatefulWidget {
+  RegisterPage({Key? key}) : super(key: key);
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final layoutConstrains = RegisterLayoutConstrains();
+
   final emailController = TextEditingController();
+
   final passwordController = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,18 +29,23 @@ class LoginPage extends StatelessWidget {
         MediaQuery.of(context).size.height * 0.4;
 
     layoutConstrains.backgroundInfoContainerSize =
-        MediaQuery.of(context).size.height * 0.6;
+        MediaQuery.of(context).size.height * 0.45;
 
     return Scaffold(
+      appBar: AppBar(),
       body: SingleChildScrollView(
         physics: MediaQuery.of(context).viewInsets.bottom != 0
             ? null
             : const NeverScrollableScrollPhysics(),
-        child: Column(
-          children: [
-            _buildLogoContainer(context),
-            _buildInfoBackgroundContainer(context)
-          ],
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            children: [
+              _buildLogoContainer(context),
+              Expanded(child: _buildInfoBackgroundContainer(context))
+            ],
+          ),
         ),
       ),
     );
@@ -45,7 +62,6 @@ class LoginPage extends StatelessWidget {
   Container _buildInfoBackgroundContainer(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: layoutConstrains.backgroundInfoContainerSize,
       color: Colors.white,
       child: Center(
           child: Padding(
@@ -67,7 +83,9 @@ class LoginPage extends StatelessWidget {
           border: Border.all(width: 5, color: const Color(0xFF6B5347)),
           borderRadius: const BorderRadius.all(Radius.circular(5))),
       child: Padding(
-        padding: EdgeInsets.all(layoutConstrains.widgetToBorderPadding),
+        padding: EdgeInsets.symmetric(
+            horizontal: layoutConstrains.widgetToBorderPadding,
+            vertical: layoutConstrains.widgetToBorderPadding),
         child: _buildInfoColumn(context),
       ),
     );
@@ -75,11 +93,11 @@ class LoginPage extends StatelessWidget {
 
   Column _buildInfoColumn(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        BlocBuilder<LoginBloc, LoginState>(
-          builder: (BuildContext context, LoginState state) {
+        BlocBuilder<RegisterBloc, RegisterState>(
+          builder: (BuildContext context, RegisterState state) {
             return _mapStateToError(context, state);
           },
         ),
@@ -102,46 +120,28 @@ class LoginPage extends StatelessWidget {
         Padding(
           padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
           child: _buildMainButton(
-              label: "Entrar",
-              backgroundColor: const Color(0xFF3C4553),
-              context: context,
-              event: LoginLoginEvent(
-                  email: emailController.text,
-                  password: passwordController.text, context: context)),
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
-          child: Container(
-            height: layoutConstrains.dividerHeight,
-            width: layoutConstrains.widgetsWidth,
-            color: const Color(0xFF6B5347),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
-          child: _buildText('Não tem uma conta? Cadastre-se já!', const Color(0xFF6B5347)),
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
-          child: _buildMainButton(
-              label: "Registrar",
+              label: "Criar cadastro",
               backgroundColor: const Color(0xFF6B5347),
               context: context,
-              event: LoginSwitchToRegisterEvent(context: context)),
+              event: RegisterCreateDentistEvent(
+                  email: emailController.text,
+                  password: passwordController.text,
+                  context: context)),
         ),
       ],
     );
   }
 
-  Text _mapStateToError(BuildContext context, LoginState state){
+  Text _mapStateToError(BuildContext context, RegisterState state) {
     switch (state.runtimeType) {
-      case LoginErrorState:
-        final _castedState = state as LoginErrorState;
+      case RegisterErrorState:
+        final _castedState = state as RegisterErrorState;
         return _buildText(_castedState.errorMessage, Colors.red);
       default:
         return _buildText("", Colors.white);
     }
   }
+
   Text _buildText(String label, Color color) {
     return Text(label,
         style: TextStyle(
@@ -180,14 +180,14 @@ class LoginPage extends StatelessWidget {
   Widget _buildMainButton(
       {required String label,
       required Color backgroundColor,
-      required LoginEvent event,
+      required RegisterEvent event,
       required context}) {
     return SizedBox(
       width: layoutConstrains.widgetsWidth,
       height: layoutConstrains.widgetsHeight,
       child: ElevatedButton(
         onPressed: () {
-          BlocProvider.of<LoginBloc>(context).add(event);
+          BlocProvider.of<RegisterBloc>(context).add(event);
         },
         child: Text(
           label,
@@ -207,7 +207,7 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-class LoginLayoutConstrains {
+class RegisterLayoutConstrains {
   double? logoContainerSize,
       backgroundInfoContainerSize,
       infosContainerHeight,
@@ -217,6 +217,5 @@ class LoginLayoutConstrains {
       widgetsFontSize = 14.0,
       widgetPadding = 18.0,
       widgetToBorderPadding = 30,
-      widgetsBorderRadius = 5.0,
-      dividerHeight = 2.0;
+      widgetsBorderRadius = 5.0;
 }

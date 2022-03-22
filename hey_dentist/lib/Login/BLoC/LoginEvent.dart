@@ -10,7 +10,11 @@ class LoginLoginEvent extends LoginEvent {
       {required this.email, required this.password, required this.context});
 }
 
-class LoginRegisterEvent extends LoginEvent {}
+class LoginSwitchToRegisterEvent extends LoginEvent {
+  final BuildContext context;
+
+  LoginSwitchToRegisterEvent({required this.context});
+}
 
 class LoginSwitchToHomeEvent extends LoginEvent {
   final BuildContext context;
