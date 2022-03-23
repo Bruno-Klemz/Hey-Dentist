@@ -14,14 +14,10 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final layoutConstrains = RegisterLayoutConstrains();
-
+  final clinicController = TextEditingController();
+  final nameController = TextEditingController();
   final emailController = TextEditingController();
-
   final passwordController = TextEditingController();
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +28,6 @@ class _RegisterPageState extends State<RegisterPage> {
         MediaQuery.of(context).size.height * 0.45;
 
     return Scaffold(
-      appBar: AppBar(),
       body: SingleChildScrollView(
         physics: MediaQuery.of(context).viewInsets.bottom != 0
             ? null
@@ -56,6 +51,16 @@ class _RegisterPageState extends State<RegisterPage> {
       width: MediaQuery.of(context).size.width,
       height: layoutConstrains.logoContainerSize,
       color: const Color(0xFF6B5347),
+      child: Center(
+        child: SizedBox(
+          height: layoutConstrains.photoHeight,
+          width: layoutConstrains.photoHeight * 1.096,
+          child: Image.asset(
+            'assets/registerPage.png',
+            fit: BoxFit.fitHeight,
+          ),
+        ),
+      ),
     );
   }
 
@@ -104,6 +109,22 @@ class _RegisterPageState extends State<RegisterPage> {
         Padding(
           padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
           child: _buildTextInput(
+              label: "nome consultório",
+              context: context,
+              keyboardType: TextInputType.emailAddress,
+              controller: clinicController),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
+          child: _buildTextInput(
+              label: "nome",
+              context: context,
+              keyboardType: TextInputType.emailAddress,
+              controller: nameController),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
+          child: _buildTextInput(
               label: "email",
               context: context,
               keyboardType: TextInputType.emailAddress,
@@ -126,6 +147,8 @@ class _RegisterPageState extends State<RegisterPage> {
               event: RegisterCreateDentistEvent(
                   email: emailController.text,
                   password: passwordController.text,
+                  clinicName: clinicController.text,
+                  userName: nameController.text,
                   context: context)),
         ),
       ],
@@ -217,5 +240,6 @@ class RegisterLayoutConstrains {
       widgetsFontSize = 14.0,
       widgetPadding = 18.0,
       widgetToBorderPadding = 30,
-      widgetsBorderRadius = 5.0;
+      widgetsBorderRadius = 5.0,
+      photoHeight = 250;
 }

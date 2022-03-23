@@ -8,7 +8,7 @@ class RegisterNavigator{
       case RegisterSwitchToHomeEvent:
         final castedEvent = event as RegisterSwitchToHomeEvent;
         const String routeName = 'RegisterScreenToHomeScreen';
-        Navigator.of(castedEvent.context).pushNamed(
+        Navigator.of(castedEvent.context).popAndPushNamed(
           routeName,
           arguments: arguments,
         );

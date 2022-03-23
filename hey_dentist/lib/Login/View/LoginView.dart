@@ -39,6 +39,16 @@ class LoginPage extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       height: layoutConstrains.logoContainerSize,
       color: const Color(0xFF6B5347),
+      child: Center(
+        child: SizedBox(
+          height: layoutConstrains.photoWidth * 1.096,
+          width: layoutConstrains.photoWidth,
+          child: Image.asset(
+            'assets/mainImage2.png',
+            fit: BoxFit.cover,
+          ),
+        ),
+      ),
     );
   }
 
@@ -103,11 +113,12 @@ class LoginPage extends StatelessWidget {
           padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
           child: _buildMainButton(
               label: "Entrar",
-              backgroundColor: const Color(0xFF3C4553),
+              backgroundColor: const Color(0xFFD1B66F),
               context: context,
               event: LoginLoginEvent(
                   email: emailController.text,
-                  password: passwordController.text, context: context)),
+                  password: passwordController.text,
+                  context: context)),
         ),
         Padding(
           padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
@@ -119,7 +130,8 @@ class LoginPage extends StatelessWidget {
         ),
         Padding(
           padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
-          child: _buildText('Não tem uma conta? Cadastre-se já!', const Color(0xFF6B5347)),
+          child: _buildText(
+              'Não tem uma conta? Cadastre-se já!', const Color(0xFF6B5347)),
         ),
         Padding(
           padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
@@ -133,7 +145,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Text _mapStateToError(BuildContext context, LoginState state){
+  Text _mapStateToError(BuildContext context, LoginState state) {
     switch (state.runtimeType) {
       case LoginErrorState:
         final _castedState = state as LoginErrorState;
@@ -142,6 +154,7 @@ class LoginPage extends StatelessWidget {
         return _buildText("", Colors.white);
     }
   }
+
   Text _buildText(String label, Color color) {
     return Text(label,
         style: TextStyle(
@@ -218,5 +231,6 @@ class LoginLayoutConstrains {
       widgetPadding = 18.0,
       widgetToBorderPadding = 30,
       widgetsBorderRadius = 5.0,
-      dividerHeight = 2.0;
+      dividerHeight = 2.0,
+      photoWidth = 200.0;
 }

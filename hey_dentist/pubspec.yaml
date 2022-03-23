@@ -37,6 +37,7 @@ dependencies:
   firebase_auth: ^3.3.8
   firebase_core: ^1.12.0
   flutter_bloc: ^8.0.1
+  http: ^0.13.4
 
 dev_dependencies:
   flutter_test:
@@ -59,7 +60,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
+  assets:
+    - assets/mainImage2.png
+    - assets/registerPage.png
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
