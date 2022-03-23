@@ -8,7 +8,7 @@ class LoginNavigator {
       case LoginSwitchToHomeEvent:
         final castedEvent = event as LoginSwitchToHomeEvent;
         const String routeName = 'LoginScreenToHomeScreen';
-        Navigator.of(castedEvent.context).pushNamed(
+        Navigator.of(castedEvent.context).popAndPushNamed(
           routeName,
           arguments: arguments,
         );

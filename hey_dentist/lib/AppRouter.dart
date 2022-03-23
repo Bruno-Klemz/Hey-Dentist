@@ -3,6 +3,7 @@ import 'package:hey_dentist/Login/View/LoginView.dart';
 import 'package:hey_dentist/Register/View/RegisterView.dart';
 
 import 'HomePage/View/HomePageView.dart';
+import 'RegisterPatient/View/RegisterPatientView.dart';
 
 class AppRouter {
   static Route? navigate(RouteSettings settings) {
@@ -18,6 +19,9 @@ class AppRouter {
 
       case 'RegisterScreenToHomeScreen':
         return MaterialPageRoute(builder: (_) => HomePage());
+
+      case 'HomeToRegisterPatient':
+        return MaterialPageRoute(builder: (_) => RegisterPatient());
       default:
         return null;
     }
