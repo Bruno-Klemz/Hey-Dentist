@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 
+import '../../Data/Dentist/UserModel.dart';
+
 abstract class LoginEvent {}
 
 class LoginLoginEvent extends LoginEvent {

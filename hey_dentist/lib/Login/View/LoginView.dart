@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hey_dentist/Login/BLoC/LoginBloc.dart';
 import 'package:hey_dentist/Login/BLoC/LoginState.dart';
 
+import '../../Components/CustomText.dart';
 import '../BLoC/LoginEvent.dart';
 
 class LoginPage extends StatelessWidget {
@@ -10,6 +12,7 @@ class LoginPage extends StatelessWidget {
   final layoutConstrains = LoginLayoutConstrains();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final customText = CustomText();
 
   @override
   Widget build(BuildContext context) {
@@ -129,10 +132,12 @@ class LoginPage extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
-          child: _buildText(
-              'Não tem uma conta? Cadastre-se já!', const Color(0xFF6B5347)),
-        ),
+            padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
+            child: customText.buildText(
+                label: 'Não tem uma conta? Cadastre-se já!',
+                color: const Color(0xFF6B5347),
+                fontSize: layoutConstrains.widgetsFontSize,
+                fontWeight: FontWeight.w400)),
         Padding(
           padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
           child: _buildMainButton(
@@ -149,18 +154,18 @@ class LoginPage extends StatelessWidget {
     switch (state.runtimeType) {
       case LoginErrorState:
         final _castedState = state as LoginErrorState;
-        return _buildText(_castedState.errorMessage, Colors.red);
-      default:
-        return _buildText("", Colors.white);
-    }
-  }
-
-  Text _buildText(String label, Color color) {
-    return Text(label,
-        style: TextStyle(
-            color: color,
+        return customText.buildText(
+            label: _castedState.errorMessage,
+            color: Colors.red,
             fontSize: layoutConstrains.widgetsFontSize,
-            fontFamily: 'Roboto'));
+            fontWeight: FontWeight.w500);
+      default:
+        return customText.buildText(
+            label: "",
+            color: Colors.white,
+            fontSize: layoutConstrains.widgetsFontSize,
+            fontWeight: FontWeight.w500);
+    }
   }
 
   Widget _buildTextInput(

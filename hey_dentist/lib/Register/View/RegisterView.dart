@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hey_dentist/Register/BLoC/RegisterBloc.dart';
 
+import '../../Components/CustomText.dart';
 import '../BLoC/RegisterEvent.dart';
 import '../BLoC/RegisterState.dart';
 
@@ -18,6 +19,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final customText = CustomText();
 
   @override
   Widget build(BuildContext context) {
@@ -159,18 +161,16 @@ class _RegisterPageState extends State<RegisterPage> {
     switch (state.runtimeType) {
       case RegisterErrorState:
         final _castedState = state as RegisterErrorState;
-        return _buildText(_castedState.errorMessage, Colors.red);
+        return customText.buildText(
+            label: _castedState.errorMessage,
+            color: Colors.red,
+            fontSize: layoutConstrains.widgetsFontSize, fontWeight: FontWeight.w500);
       default:
-        return _buildText("", Colors.white);
+        return customText.buildText(
+            label:'',
+            color: Colors.white,
+            fontSize: layoutConstrains.widgetsFontSize, fontWeight: FontWeight.w500);
     }
-  }
-
-  Text _buildText(String label, Color color) {
-    return Text(label,
-        style: TextStyle(
-            color: color,
-            fontSize: layoutConstrains.widgetsFontSize,
-            fontFamily: 'Roboto'));
   }
 
   Widget _buildTextInput(

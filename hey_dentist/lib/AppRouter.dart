@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hey_dentist/Data/Dentist/UserModel.dart';
 import 'package:hey_dentist/Login/View/LoginView.dart';
 import 'package:hey_dentist/Register/View/RegisterView.dart';
+import 'package:hey_dentist/RegisterAppointment/View/RegisterAppointmentView.dart';
 
 import 'HomePage/View/HomePageView.dart';
 import 'RegisterPatient/View/RegisterPatientView.dart';
@@ -15,13 +17,24 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => RegisterPage());
 
       case 'LoginScreenToHomeScreen':
-        return MaterialPageRoute(builder: (_) => HomePage());
+        final user = settings.arguments as UserModel;
+        return MaterialPageRoute(builder: (_) => HomePage(user: user));
 
       case 'RegisterScreenToHomeScreen':
-        return MaterialPageRoute(builder: (_) => HomePage());
+        final user = settings.arguments as UserModel;
+        return MaterialPageRoute(builder: (_) => HomePage(user: user));
 
       case 'HomeToRegisterPatient':
-        return MaterialPageRoute(builder: (_) => RegisterPatient());
+        return MaterialPageRoute(builder: (_) => const RegisterPatient());
+
+      case 'HomeToRegisterAppointment':
+        final user = settings.arguments as UserModel;
+        return MaterialPageRoute(
+            builder: (_) => RegisterAppointment(user: user));
+
+      case 'RegisterAppointmentToHome':
+        final user = settings.arguments as UserModel;
+        return MaterialPageRoute(builder: (_) => HomePage(user: user));
       default:
         return null;
     }
