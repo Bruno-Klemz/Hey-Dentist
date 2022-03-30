@@ -5,7 +5,7 @@ class Auth {
   Future<void> signIn({required String email, required String password}) async {
     try {
       UserCredential _ = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(email: email, password: password);
+          .signInWithEmailAndPassword(email: 'klemz.bruno@gmail.com', password: 'Coritiba1998');
     } on FirebaseAuthException {
       rethrow;
     }

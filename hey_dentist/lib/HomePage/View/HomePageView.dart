@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import '../../Data/Dentist/UserModel.dart';
 import '../BLoC/HomePageBloc.dart';
 import '../BLoC/HomePageEvent.dart';
 
 class HomePage extends StatelessWidget {
-  HomePage({Key? key}) : super(key: key);
+  final UserModel user;
+  HomePage({Key? key, required this.user}) : super(key: key) {
+    print(user.appointmentList.length);
+  }
   final layoutConstrains = HomePageLayoutConstrains();
 
   @override
@@ -36,9 +39,6 @@ class HomePage extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       height: layoutConstrains.logoContainerSize,
       color: const Color(0xFF6B5347),
-      child: Center(
-        child: Image.asset('assets/mainImage1.jpg'),
-      ),
     );
   }
 
@@ -83,7 +83,9 @@ class HomePage extends StatelessWidget {
             backgroundColor: const Color(0xFFD1B66F),
             context: context,
             event: HomePageSwitchToNextScreenEvent(
-                context: context, routeName: 'HomeToRegisterPatient')),
+                context: context,
+                routeName: 'HomeToRegisterPatient',
+                user: user)),
         Padding(
           padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
           child: _buildMainButton(
@@ -91,7 +93,9 @@ class HomePage extends StatelessWidget {
               backgroundColor: const Color(0xFFD1B66F),
               context: context,
               event: HomePageSwitchToNextScreenEvent(
-                  context: context, routeName: 'HomeToRegisterAppointment')),
+                  context: context,
+                  routeName: 'HomeToRegisterAppointment',
+                  user: user)),
         ),
         Padding(
           padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
@@ -100,7 +104,9 @@ class HomePage extends StatelessWidget {
               backgroundColor: const Color(0xFF6B5347),
               context: context,
               event: HomePageSwitchToNextScreenEvent(
-                  context: context, routeName: 'HomeToManagePatient')),
+                  context: context,
+                  routeName: 'HomeToManagePatient',
+                  user: user)),
         ),
         Padding(
           padding: EdgeInsets.only(top: layoutConstrains.widgetPadding),
@@ -109,18 +115,12 @@ class HomePage extends StatelessWidget {
               backgroundColor: const Color(0xFF6B5347),
               context: context,
               event: HomePageSwitchToNextScreenEvent(
-                  context: context, routeName: 'HomeToVisualizeAppointment')),
+                  context: context,
+                  routeName: 'HomeToVisualizeAppointment',
+                  user: user)),
         ),
       ],
     );
-  }
-
-  Text _buildText(String label, Color color) {
-    return Text(label,
-        style: TextStyle(
-            color: color,
-            fontSize: layoutConstrains.widgetsFontSize,
-            fontFamily: 'Roboto'));
   }
 
   Widget _buildMainButton(

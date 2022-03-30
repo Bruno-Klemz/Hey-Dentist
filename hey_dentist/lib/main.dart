@@ -8,9 +8,7 @@ import 'AppRouter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(
-    
-    MultiBlocProvider(
+  runApp(MultiBlocProvider(
     providers: AppBlocProvider().getAppBlocProvider(),
     child: const MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -18,5 +16,3 @@ Future<void> main() async {
         onGenerateRoute: AppRouter.navigate),
   ));
 }
-
-
