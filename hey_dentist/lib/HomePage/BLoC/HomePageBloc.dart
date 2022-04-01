@@ -7,7 +7,7 @@ class HomePageBloc extends Bloc<HomePageEvent, HomePageState> {
   HomePageBloc(initialState, HomePageNavigator navigator)
       : super(initialState) {
     on<HomePageSwitchToNextScreenEvent>((event, emit) {
-      navigator.navigate(event, arguments: event.user);
+      navigator.navigate(event, arguments: {'user': event.user, 'context': event.context});
     });
   }
 }
