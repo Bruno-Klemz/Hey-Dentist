@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hey_dentist/Data/Appointment/AppointmentModel.dart';
 import 'package:hey_dentist/Data/Appointment/AppointmentRepository.dart';
@@ -35,10 +36,14 @@ class RegisterAppointmentBloc
 
       if (event.label == 'Hora inicial') {
         emit(RegisterAppointmentInitialHourPickerState(
-            hour: formattedHour, label: event.label));
+            hour: formattedHour,
+            label: event.label,
+            timeOfDay: event.hour as TimeOfDay));
       } else {
         emit(RegisterAppointmentEndHourPickerState(
-            hour: formattedHour, label: event.label));
+            hour: formattedHour,
+            label: event.label,
+            timeOfDay: event.hour as TimeOfDay));
       }
     });
     on<RegisterAppointmentRegisterEvent>((event, emit) async {
@@ -48,11 +53,14 @@ class RegisterAppointmentBloc
           dentistName: event.dentistName,
           date: event.date,
           initialHour: event.initialHour,
-          endHour: event.endHour);
+          endHour: event.endHour, procedure: event.procedure);
       user.appointmentList.add(appointment);
       await repo.createNewAppointment(userID: user.userID, model: appointment);
 
       navigator.navigate(event, arguments: user);
     });
+    on<RegisterAppointmentHourErrorEvent>((event, emit) => emit(
+        RegisterAppointmentHourErrorState(
+            errorMessage: event.errorMessage, label: event.label)));
   }
 }

@@ -1,5 +1,5 @@
 class Appointment {
-  final String pacientName, dentistName, date, initialHour, endHour;
+  final String pacientName, dentistName, date, initialHour, endHour, procedure;
 
   Appointment({
     required this.pacientName,
@@ -7,6 +7,7 @@ class Appointment {
     required this.date,
     required this.initialHour,
     required this.endHour,
+    required this.procedure
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
@@ -15,7 +16,7 @@ class Appointment {
         dentistName: json['DentistName'],
         date: json['Date'],
         initialHour: json['InitialHour'],
-        endHour: json['EndHour']);
+        endHour: json['EndHour'], procedure: json['Procedure']);
   }
 
   Map<String, dynamic> toJson() => {
@@ -23,6 +24,6 @@ class Appointment {
         'DentistName': dentistName,
         'Date': date,
         'InitialHour': initialHour,
-        'EndHour': endHour
+        'EndHour': endHour, 'Procedure': procedure
       };
 }

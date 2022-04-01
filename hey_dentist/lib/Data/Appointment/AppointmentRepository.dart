@@ -11,6 +11,10 @@ class AppointmentRepository {
   Future<void> createNewAppointment(
       {required String? userID, required Appointment model}) async {
     String json = jsonEncode(model);
-    await api.createAppointment(userID: userID, body: json, pacientName: model.pacientName, date: model.date);
+    await api.createAppointment(
+        userID: userID,
+        body: json,
+        pacientName: model.pacientName,
+        date: model.date);
   }
 }

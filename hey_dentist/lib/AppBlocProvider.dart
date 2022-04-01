@@ -13,6 +13,8 @@ import 'package:hey_dentist/RegisterAppointment/BLoC/RegisterAppointmentState.da
 import 'package:hey_dentist/RegisterAppointment/Navigator/RegisterAppointmentNavigator.dart';
 import 'package:hey_dentist/RegisterPatient/BLoC/RegisterPatientBloc.dart';
 import 'package:hey_dentist/RegisterPatient/BLoC/RegisterPatientState.dart';
+import 'package:hey_dentist/VisualizeAppointment/BLoC/VisualizeAppointmentBloc.dart';
+import 'package:hey_dentist/VisualizeAppointment/BLoC/VisualizeAppointmentState.dart';
 
 import 'Auth/auth.dart';
 import 'HomePage/BLoC/HomePageBloc.dart';
@@ -51,6 +53,10 @@ class AppBlocProvider {
               RegisterAppointmentInitialState(),
               RegisterAppointmentNavigator(),
               AppointmentRepository(api: AppointmentAPI()))),
+
+      BlocProvider<VisualizeAppointmentBloc>(
+          create: (BuildContext context) =>
+              VisualizeAppointmentBloc(VisualizeAppointmentInitialState())),
     ];
     return blocProviderList;
   }

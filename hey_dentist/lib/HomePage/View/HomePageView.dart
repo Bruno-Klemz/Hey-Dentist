@@ -6,9 +6,7 @@ import '../BLoC/HomePageEvent.dart';
 
 class HomePage extends StatelessWidget {
   final UserModel user;
-  HomePage({Key? key, required this.user}) : super(key: key) {
-    print(user.appointmentList.length);
-  }
+  HomePage({Key? key, required this.user}) : super(key: key);
   final layoutConstrains = HomePageLayoutConstrains();
 
   @override

@@ -29,6 +29,7 @@ class RegisterAppointment extends StatelessWidget {
   List<String> dentistList = [];
   List<String> patientList = [];
   late String date, initialHour, endHour;
+  final procedureController = TextEditingController();
 
   List<String> _fetchDentistNameList() {
     List<String> dentistNameList = [];
@@ -54,57 +55,103 @@ class RegisterAppointment extends StatelessWidget {
 
     layoutConstrains.verticalScreenPadding =
         MediaQuery.of(context).size.height * 0.025;
-    return GestureDetector(
-      onTap: () {
-        _closeKeyboard(context);
-      },
-      onVerticalDragStart: (_) {
-        _closeKeyboard(context);
-      },
-      child: Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: _buildAppBar(context),
-        body: Padding(
+    return Scaffold(
+      appBar: _buildAppBar(context),
+      body: SingleChildScrollView(
+        physics: ClampingScrollPhysics(),
+        child: Padding(
           padding: EdgeInsets.symmetric(
               horizontal: layoutConstrains.horizontalScreenPadding,
               vertical: layoutConstrains.verticalScreenPadding),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  _buildDropDown(
-                      context: context,
-                      label: 'Doutor Responsável',
-                      valuesList: dentistList,
-                      dropDownValue: dropDownValuesMap['Doctor'] as String,
-                      dropDownKey: 'Doctor'),
-                  Padding(
-                    padding:
-                        EdgeInsets.only(top: layoutConstrains.widgetsPadding),
-                    child: _buildDropDown(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.8,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  children: [
+                    _buildDropDown(
                         context: context,
-                        label: 'Paciente',
-                        valuesList: patientList,
-                        dropDownValue: dropDownValuesMap['Patient'] as String,
-                        dropDownKey: 'Patient'),
-                  ),
-                  Padding(
+                        label: 'Doutor Responsável',
+                        valuesList: dentistList,
+                        dropDownValue: dropDownValuesMap['Doctor'] as String,
+                        dropDownKey: 'Doctor'),
+                    Padding(
                       padding:
                           EdgeInsets.only(top: layoutConstrains.widgetsPadding),
-                      child: _buildDatePicker(context)),
-                  Padding(
+                      child: _buildDropDown(
+                          context: context,
+                          label: 'Paciente',
+                          valuesList: patientList,
+                          dropDownValue: dropDownValuesMap['Patient'] as String,
+                          dropDownKey: 'Patient'),
+                    ),
+                    Padding(
+                        padding: EdgeInsets.only(
+                            top: layoutConstrains.widgetsPadding),
+                        child: _buildDatePicker(context)),
+                    Padding(
                       padding:
                           EdgeInsets.only(top: layoutConstrains.widgetsPadding),
-                      child: _buildHourPicker(context, 'Hora inicial')),
-                  Padding(
+                      child: BlocBuilder<RegisterAppointmentBloc,
+                          RegisterAppointmentState>(
+                        builder: (BuildContext context,
+                            RegisterAppointmentState state) {
+                          return _buildHourPicker(
+                              context, 'Hora inicial', state);
+                        },
+                      ),
+                    ),
+                    Padding(
                       padding:
                           EdgeInsets.only(top: layoutConstrains.widgetsPadding),
-                      child: _buildHourPicker(context, 'Hora final')),
-                ],
-              ),
-              _buildMainButton(context: context),
-            ],
+                      child: BlocBuilder<RegisterAppointmentBloc,
+                          RegisterAppointmentState>(
+                        builder: (BuildContext context,
+                            RegisterAppointmentState state) {
+                          return _mapStateToHourErrorLabel(
+                              state, 'Hora inicial');
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsets.only(top: layoutConstrains.widgetsPadding),
+                      child: BlocBuilder<RegisterAppointmentBloc,
+                          RegisterAppointmentState>(
+                        builder: (BuildContext context,
+                            RegisterAppointmentState state) {
+                          return _buildHourPicker(context, 'Hora final', state);
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsets.only(top: layoutConstrains.widgetsPadding),
+                      child: BlocBuilder<RegisterAppointmentBloc,
+                          RegisterAppointmentState>(
+                        builder: (BuildContext context,
+                            RegisterAppointmentState state) {
+                          return _mapStateToHourErrorLabel(state, 'Hora final');
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding:
+                          EdgeInsets.only(top: layoutConstrains.widgetsPadding),
+                      child: _buildTextInput(),
+                    ),
+                  ],
+                ),
+                BlocBuilder<RegisterAppointmentBloc, RegisterAppointmentState>(
+                  builder:
+                      (BuildContext context, RegisterAppointmentState state) {
+                    return _mapStateToMainButton(
+                        context: context, state: state);
+                  },
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -332,51 +379,83 @@ class RegisterAppointment extends StatelessWidget {
     }
   }
 
-  Widget _buildHourPicker(BuildContext context, String label) {
+  Widget _mapStateToHourErrorLabel(
+      RegisterAppointmentState state, String label) {
+    switch (state.runtimeType) {
+      case RegisterAppointmentHourErrorState:
+        final _castedState = state as RegisterAppointmentHourErrorState;
+        if (_castedState.label == label) {
+          return customText.buildText(
+              label: _castedState.errorMessage,
+              color: Colors.red,
+              fontSize: layoutConstrains.valuesFontSize,
+              fontWeight: FontWeight.w400);
+        } else {
+          return Container();
+        }
+
+      default:
+        return Container();
+    }
+  }
+
+  Widget _buildHourPicker(
+      BuildContext context, String label, RegisterAppointmentState state) {
+    Color color = _mapStateToColor(state: state, label: label);
+
     return SizedBox(
       width: layoutConstrains.widgetWidth,
-      height: layoutConstrains.widgetHeight,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           customText.buildText(
               label: label,
-              color: const Color(0xFF6B5347),
+              color: color,
               fontSize: layoutConstrains.labelFontSize,
               fontWeight: FontWeight.w400),
           Padding(
-            padding:
-                EdgeInsets.only(top: layoutConstrains.widgetsToLabelPadding),
-            child: GestureDetector(
-              child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height / 20,
-                  decoration: const BoxDecoration(
-                    border: Border(
-                        bottom:
-                            BorderSide(width: 1.25, color: Color(0xFF6B5347))),
+              padding:
+                  EdgeInsets.only(top: layoutConstrains.widgetsToLabelPadding),
+              child: Column(
+                children: [
+                  GestureDetector(
+                    child: Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height / 20,
+                        decoration: BoxDecoration(
+                          border: Border(
+                              bottom: BorderSide(width: 1.25, color: color)),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            BlocBuilder<RegisterAppointmentBloc,
+                                RegisterAppointmentState>(
+                              builder: (_, RegisterAppointmentState state) {
+                                return _mapStateToHourPickerLabel(state, label);
+                              },
+                            ),
+                            Icon(
+                              Icons.arrow_drop_down,
+                              size: layoutConstrains.iconSize,
+                              color: color,
+                            )
+                          ],
+                        )),
+                    onTap: () {
+                      if ((label == 'Hora final' &&
+                              state.runtimeType ==
+                                  RegisterAppointmentInitialHourPickerState) ||
+                          (label == 'Hora final' &&
+                              state.runtimeType ==
+                                  RegisterAppointmentEndHourPickerState) ||
+                          label == 'Hora inicial') {
+                        getHour(context, label, state);
+                      }
+                    },
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      BlocBuilder<RegisterAppointmentBloc,
-                          RegisterAppointmentState>(
-                        builder: (_, RegisterAppointmentState state) {
-                          return _mapStateToHourPickerLabel(state, label);
-                        },
-                      ),
-                      Icon(
-                        Icons.arrow_drop_down,
-                        size: layoutConstrains.iconSize,
-                        color: const Color(0xFF6B5347),
-                      )
-                    ],
-                  )),
-              onTap: () {
-                getHour(context, label);
-              },
-            ),
-          ),
+                ],
+              )),
         ],
       ),
     );
@@ -417,6 +496,27 @@ class RegisterAppointment extends StatelessWidget {
               fontSize: layoutConstrains.valuesFontSize,
               fontWeight: FontWeight.w400);
         }
+      case RegisterAppointmentHourErrorState:
+        final _castedState = state as RegisterAppointmentHourErrorState;
+        if (label == _castedState.label) {
+          return customText.buildText(
+              label: 'Escolha uma hora válida',
+              color: Colors.red,
+              fontSize: layoutConstrains.valuesFontSize,
+              fontWeight: FontWeight.w400);
+        } else if (label == 'Hora inicial') {
+          return customText.buildText(
+              label: initialHour,
+              color: const Color(0xFF6B5347),
+              fontSize: layoutConstrains.widgetsFontSize,
+              fontWeight: FontWeight.w400);
+        } else {
+          return customText.buildText(
+              label: endHour,
+              color: const Color(0xFFBDBDBD),
+              fontSize: layoutConstrains.widgetsFontSize,
+              fontWeight: FontWeight.w400);
+        }
       default:
         if (label == 'Hora inicial') {
           return customText.buildText(
@@ -427,45 +527,105 @@ class RegisterAppointment extends StatelessWidget {
         } else {
           return customText.buildText(
               label: endHour,
-              color: const Color(0xFF6B5347),
+              color: const Color(0xFFBDBDBD),
               fontSize: layoutConstrains.widgetsFontSize,
               fontWeight: FontWeight.w400);
         }
     }
   }
 
-  void getHour(BuildContext context, String label) async {
-    final timeDefault = TimeOfDay.now();
+  void getHour(BuildContext context, String label,
+      RegisterAppointmentState state) async {
+    late TimeOfDay timeDefault;
+    switch (state.runtimeType) {
+      case RegisterAppointmentInitialHourPickerState:
+        final _castedState = state as RegisterAppointmentInitialHourPickerState;
+        if (label == _castedState.label) {
+          timeDefault = _castedState.timeOfDay;
+        } else {
+          timeDefault = TimeOfDay.now();
+        }
+        break;
+      case RegisterAppointmentEndHourPickerState:
+        final _castedState = state as RegisterAppointmentEndHourPickerState;
+        if (label == _castedState.label) {
+          timeDefault = _castedState.timeOfDay;
+        }
+        break;
+      default:
+        timeDefault = TimeOfDay.now();
+    }
+
     final TimeOfDay? newTime = await showTimePicker(
       context: context,
       initialTime: timeDefault,
       initialEntryMode: TimePickerEntryMode.input,
     );
-    if (newTime != null) {
+    if (newTime != null && (newTime.minute == 0 || newTime.minute == 30)) {
       BlocProvider.of<RegisterAppointmentBloc>(context)
           .add(RegisterAppointmentHourPickerEvent(hour: newTime, label: label));
     } else {
       BlocProvider.of<RegisterAppointmentBloc>(context).add(
-          RegisterAppointmentHourPickerEvent(hour: timeDefault, label: label));
+          RegisterAppointmentHourErrorEvent(
+              errorMessage: 'Os valores de minuto devem ser 0 ou 30',
+              label: label));
     }
   }
 
-  Widget _buildMainButton({required context}) {
+  Widget _mapStateToMainButton(
+      {required BuildContext context,
+      required RegisterAppointmentState state}) {
+    switch (state.runtimeType) {
+      case RegisterAppointmentEndHourPickerState:
+        return _buildMainButton(
+            context: context,
+            backgroundColor: const Color(0xFF6B5347),
+            state: state);
+      default:
+        return _buildMainButton(
+            context: context, backgroundColor: const Color(0xFFBDBDBD));
+    }
+  }
+
+  Widget _buildTextInput() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+            child: customText.buildText(
+                label: 'Procedimento',
+                color: const Color(0xFF6B5347),
+                fontSize: layoutConstrains.widgetsFontSize,
+                fontWeight: FontWeight.w400)),
+        SizedBox(
+          height: layoutConstrains.textInputHeight,
+          width: layoutConstrains.textInputWidth,
+          child: TextField(
+            keyboardType: TextInputType.text,
+            textAlign: TextAlign.center,
+            controller: procedureController,
+            style: const TextStyle(
+              fontSize: 16,
+              fontFamily: 'Roboto',
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildMainButton(
+      {required context,
+      required Color backgroundColor,
+      RegisterAppointmentState? state}) {
     return SizedBox(
       width: layoutConstrains.widgetWidth,
       height: layoutConstrains.buttonHeigth,
       child: ElevatedButton(
         onPressed: () {
-          BlocProvider.of<RegisterAppointmentBloc>(context)
-              .add(RegisterAppointmentRegisterEvent(
-            dentistName: dropDownValuesMap['Doctor'] as String,
-            pacientName: dropDownValuesMap['Patient'] as String,
-            date: date,
-            initialHour: initialHour,
-            endHour: endHour,
-            user: user,
-            context: context,
-          ));
+          if (state.runtimeType == RegisterAppointmentEndHourPickerState) {
+            _registerEvent(context);
+          }
         },
         child: Text(
           'Marcar consulta',
@@ -475,13 +635,46 @@ class RegisterAppointment extends StatelessWidget {
               fontFamily: 'Roboto'),
         ),
         style: ElevatedButton.styleFrom(
-            primary: const Color(0xFFD1B66F),
+            primary: backgroundColor,
             shape: RoundedRectangleBorder(
               borderRadius:
                   BorderRadius.circular(layoutConstrains.widgetsBorderRadius),
             )),
       ),
     );
+  }
+
+  void _registerEvent(BuildContext context) {
+    BlocProvider.of<RegisterAppointmentBloc>(context).add(
+        RegisterAppointmentRegisterEvent(
+            dentistName: dropDownValuesMap['Doctor'] as String,
+            pacientName: dropDownValuesMap['Patient'] as String,
+            date: date,
+            initialHour: initialHour,
+            endHour: endHour,
+            user: user,
+            context: context,
+            procedure: procedureController.text));
+  }
+
+  Color _mapStateToColor(
+      {required RegisterAppointmentState state, required String label}) {
+    if (state.runtimeType == RegisterAppointmentEndHourPickerState ||
+        (label == 'Hora inicial' &&
+            state.runtimeType != RegisterAppointmentHourErrorState) ||
+        (label == 'Hora final' &&
+            state.runtimeType == RegisterAppointmentInitialHourPickerState)) {
+      return const Color(0xFF6B5347);
+    } else if (state.runtimeType == RegisterAppointmentHourErrorState) {
+      final _castedState = state as RegisterAppointmentHourErrorState;
+      if (label == _castedState.label) {
+        return Colors.red;
+      } else {
+        return const Color(0xFF6B5347);
+      }
+    } else {
+      return const Color(0xFFBDBDBD);
+    }
   }
 
   void _closeKeyboard(BuildContext context) {

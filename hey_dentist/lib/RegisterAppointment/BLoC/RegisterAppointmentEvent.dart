@@ -25,7 +25,7 @@ class RegisterAppointmentHourPickerEvent extends RegisterAppointmentEvent {
 
 class RegisterAppointmentRegisterEvent extends RegisterAppointmentEvent {
   final String dentistName, pacientName, date, initialHour, endHour;
-  final String? procedure, tools, observations;
+  final String procedure;
   final UserModel user;
   final BuildContext context;
 
@@ -37,7 +37,11 @@ class RegisterAppointmentRegisterEvent extends RegisterAppointmentEvent {
       required this.endHour,
       required this.user,
       required this.context,
-      this.procedure,
-      this.tools,
-      this.observations});
+      required this.procedure});
+}
+
+class RegisterAppointmentHourErrorEvent extends RegisterAppointmentEvent {
+  final String errorMessage, label;
+
+  RegisterAppointmentHourErrorEvent({required this.errorMessage, required this.label});
 }
