@@ -19,8 +19,24 @@ class RegisterAppointmentDatePickerEvent extends RegisterAppointmentEvent {
 class RegisterAppointmentHourPickerEvent extends RegisterAppointmentEvent {
   final TimeOfDay? hour;
   final String label;
+  final String? initialHour;
+  final bool isSameDay;
+  final BuildContext context;
 
-  RegisterAppointmentHourPickerEvent({required this.hour, required this.label});
+  RegisterAppointmentHourPickerEvent(
+      {required this.hour,
+      required this.label,
+      required this.isSameDay,
+      required this.context,
+      this.initialHour});
+}
+
+class RegisterAppointmentEmitHourPickerEvent extends RegisterAppointmentEvent {
+  final String label;
+  final TimeOfDay hour;
+
+  RegisterAppointmentEmitHourPickerEvent(
+      {required this.label, required this.hour});
 }
 
 class RegisterAppointmentRegisterEvent extends RegisterAppointmentEvent {
@@ -43,5 +59,6 @@ class RegisterAppointmentRegisterEvent extends RegisterAppointmentEvent {
 class RegisterAppointmentHourErrorEvent extends RegisterAppointmentEvent {
   final String errorMessage, label;
 
-  RegisterAppointmentHourErrorEvent({required this.errorMessage, required this.label});
+  RegisterAppointmentHourErrorEvent(
+      {required this.errorMessage, required this.label});
 }

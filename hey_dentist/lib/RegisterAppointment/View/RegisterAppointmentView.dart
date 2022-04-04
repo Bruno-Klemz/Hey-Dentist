@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hey_dentist/Components/CustomText.dart';
 import 'package:hey_dentist/RegisterAppointment/BLoC/RegisterAppointmentBloc.dart';
 import 'package:hey_dentist/RegisterAppointment/BLoC/RegisterAppointmentEvent.dart';
 import 'package:hey_dentist/RegisterAppointment/BLoC/RegisterAppointmentState.dart';
@@ -8,12 +7,14 @@ import 'package:hey_dentist/RegisterAppointment/BLoC/RegisterAppointmentState.da
 import '../../Data/Clinic/ClinicModel.dart';
 import '../../Data/Dentist/UserModel.dart';
 import '../../Data/Pacient/PacientModel.dart';
+import '../../Helpers/BusinessLogic/Duration.dart';
+import '../../Helpers/Components/CustomText.dart';
 
 class RegisterAppointment extends StatelessWidget {
-  final UserModel user;
   RegisterAppointment({Key? key, required this.user}) : super(key: key) {
     patientList = _fetchPacientList();
     dentistList = _fetchDentistNameList();
+    actualDate = _fetchDateTime();
     dropDownValuesMap = {
       'Doctor': dentistList.first,
       'Patient': patientList.first
@@ -22,14 +23,17 @@ class RegisterAppointment extends StatelessWidget {
     initialHour = 'Escolha a hora de início';
     endHour = 'Escolha a hora de término';
   }
-
+  bool isSameDay = true;
+  final UserModel user;
   final customText = CustomText();
   final layoutConstrains = RegisterAppointmentLayoutConstrains();
+  final durationBusinessLogic = DurationBusinessLogic();
   Map<String, String> dropDownValuesMap = {};
   List<String> dentistList = [];
   List<String> patientList = [];
   late String date, initialHour, endHour;
   final procedureController = TextEditingController();
+  late DateTime actualDate;
 
   List<String> _fetchDentistNameList() {
     List<String> dentistNameList = [];
@@ -48,6 +52,14 @@ class RegisterAppointment extends StatelessWidget {
     return patientList;
   }
 
+  DateTime _fetchDateTime() {
+    int actualYear = DateTime.now().year;
+    int actualMonth = DateTime.now().month;
+    int actualDay = DateTime.now().day;
+    final actualDate = DateTime(actualYear, actualMonth, actualDay);
+    return actualDate;
+  }
+
   @override
   Widget build(BuildContext context) {
     layoutConstrains.horizontalScreenPadding =
@@ -58,7 +70,7 @@ class RegisterAppointment extends StatelessWidget {
     return Scaffold(
       appBar: _buildAppBar(context),
       body: SingleChildScrollView(
-        physics: ClampingScrollPhysics(),
+        physics: const ClampingScrollPhysics(),
         child: Padding(
           padding: EdgeInsets.symmetric(
               horizontal: layoutConstrains.horizontalScreenPadding,
@@ -340,23 +352,24 @@ class RegisterAppointment extends StatelessWidget {
   }
 
   void getDatePicker(BuildContext context) async {
-    int actualYear = DateTime.now().year;
-    int actualMonth = DateTime.now().month;
-    int actualDay = DateTime.now().day;
-    DateTime date = DateTime(actualYear, actualMonth, actualDay);
     final DateTime? newDate = await showDatePicker(
       context: context,
-      initialDate: DateTime(actualYear, actualMonth, actualDay),
-      firstDate: DateTime(actualYear - 5, 1),
-      lastDate: DateTime(actualYear + 5, 12),
+      initialDate: actualDate,
+      firstDate: DateTime(actualDate.year - 5, 1),
+      lastDate: DateTime(actualDate.year + 5, 12),
       helpText: 'Selecione uma data',
     );
+
     if (newDate != null) {
+      isSameDay =
+          (durationBusinessLogic.getDateTimeDifference(actualDate, newDate)) ==
+              0;
+      actualDate = newDate;
       BlocProvider.of<RegisterAppointmentBloc>(context)
           .add(RegisterAppointmentDatePickerEvent(date: newDate));
     } else {
       BlocProvider.of<RegisterAppointmentBloc>(context)
-          .add(RegisterAppointmentDatePickerEvent(date: date));
+          .add(RegisterAppointmentDatePickerEvent(date: actualDate));
     }
   }
 
@@ -444,11 +457,10 @@ class RegisterAppointment extends StatelessWidget {
                         )),
                     onTap: () {
                       if ((label == 'Hora final' &&
-                              state.runtimeType ==
-                                  RegisterAppointmentInitialHourPickerState) ||
-                          (label == 'Hora final' &&
-                              state.runtimeType ==
-                                  RegisterAppointmentEndHourPickerState) ||
+                              (state.runtimeType ==
+                                  RegisterAppointmentInitialHourPickerState || state.runtimeType ==
+                                  RegisterAppointmentEndHourPickerState || state.runtimeType ==
+                                  RegisterAppointmentHourErrorState))  ||
                           label == 'Hora inicial') {
                         getHour(context, label, state);
                       }
@@ -536,39 +548,20 @@ class RegisterAppointment extends StatelessWidget {
 
   void getHour(BuildContext context, String label,
       RegisterAppointmentState state) async {
-    late TimeOfDay timeDefault;
-    switch (state.runtimeType) {
-      case RegisterAppointmentInitialHourPickerState:
-        final _castedState = state as RegisterAppointmentInitialHourPickerState;
-        if (label == _castedState.label) {
-          timeDefault = _castedState.timeOfDay;
-        } else {
-          timeDefault = TimeOfDay.now();
-        }
-        break;
-      case RegisterAppointmentEndHourPickerState:
-        final _castedState = state as RegisterAppointmentEndHourPickerState;
-        if (label == _castedState.label) {
-          timeDefault = _castedState.timeOfDay;
-        }
-        break;
-      default:
-        timeDefault = TimeOfDay.now();
-    }
+    final time = _mapStateToTimeOfDay(state: state, label: label);
 
     final TimeOfDay? newTime = await showTimePicker(
       context: context,
-      initialTime: timeDefault,
+      initialTime: time,
       initialEntryMode: TimePickerEntryMode.input,
     );
-    if (newTime != null && (newTime.minute == 0 || newTime.minute == 30)) {
+    if(label == 'Hora final'){
       BlocProvider.of<RegisterAppointmentBloc>(context)
-          .add(RegisterAppointmentHourPickerEvent(hour: newTime, label: label));
-    } else {
-      BlocProvider.of<RegisterAppointmentBloc>(context).add(
-          RegisterAppointmentHourErrorEvent(
-              errorMessage: 'Os valores de minuto devem ser 0 ou 30',
-              label: label));
+          .add(RegisterAppointmentHourPickerEvent(hour: newTime, label: label, isSameDay: isSameDay, context: context, initialHour: initialHour));
+    }
+    else{
+      BlocProvider.of<RegisterAppointmentBloc>(context)
+          .add(RegisterAppointmentHourPickerEvent(hour: newTime, label: label, isSameDay: isSameDay, context: context));
     }
   }
 
@@ -642,6 +635,28 @@ class RegisterAppointment extends StatelessWidget {
             )),
       ),
     );
+  }
+
+  TimeOfDay _mapStateToTimeOfDay(
+      {required String label, required RegisterAppointmentState state}) {
+    switch (state.runtimeType) {
+      case RegisterAppointmentInitialHourPickerState:
+        final _castedState = state as RegisterAppointmentInitialHourPickerState;
+        if (label == _castedState.label) {
+          return _castedState.timeOfDay;
+        } else {
+          return TimeOfDay.now();
+        }
+      case RegisterAppointmentEndHourPickerState:
+        final _castedState = state as RegisterAppointmentEndHourPickerState;
+        if (label == _castedState.label) {
+          return _castedState.timeOfDay;
+        } else {
+          return TimeOfDay.now();
+        }
+      default:
+        return TimeOfDay.now();
+    }
   }
 
   void _registerEvent(BuildContext context) {

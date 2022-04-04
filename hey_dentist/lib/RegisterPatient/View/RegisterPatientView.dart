@@ -3,9 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hey_dentist/Data/Pacient/PacientModel.dart';
 import 'package:hey_dentist/RegisterPatient/BLoC/RegisterPatientBloc.dart';
 import 'package:hey_dentist/RegisterPatient/BLoC/RegisterPatientState.dart';
-
-import '../../Components/CustomLabeledTextInput.dart';
-import '../../Components/CustomText.dart';
+import '../../Helpers/Components/CustomLabeledTextInput.dart';
+import '../../Helpers/Components/CustomText.dart';
 import '../BLoC/RegisterPatientEvent.dart';
 
 class RegisterPatient extends StatefulWidget {
@@ -17,12 +16,10 @@ class RegisterPatient extends StatefulWidget {
 
 class _RegisterPatientState extends State<RegisterPatient> {
   final customText = CustomText();
-
   final customLabeledTextInput = CustomLabeledTextInput();
-
   final layoutConstrains = RegisterPatientLayoutConstrains();
-
   final formsVariablesLists = FormsVariablesLists();
+
   List<String> firstLabelsList = [];
   List<String> secondLabelsList = [];
   List<TextInputType> firstKeyboardTypeList = [];
