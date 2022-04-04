@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hey_dentist/Login/BLoC/LoginBloc.dart';
 import 'package:hey_dentist/Login/BLoC/LoginState.dart';
-
-import '../../Components/CustomText.dart';
+import '../../Helpers/Components/CustomText.dart';
 import '../BLoC/LoginEvent.dart';
 
 class LoginPage extends StatelessWidget {

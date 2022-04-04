@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hey_dentist/Register/BLoC/RegisterBloc.dart';
-
-import '../../Components/CustomText.dart';
+import '../../Helpers/Components/CustomText.dart';
 import '../BLoC/RegisterEvent.dart';
 import '../BLoC/RegisterState.dart';
 

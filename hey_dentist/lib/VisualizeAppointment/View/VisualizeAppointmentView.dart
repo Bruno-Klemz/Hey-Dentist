@@ -2,26 +2,46 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hey_dentist/Data/Appointment/AppointmentModel.dart';
 import 'package:hey_dentist/Data/Dentist/UserModel.dart';
+import 'package:hey_dentist/Helpers/BusinessLogic/DateTime.dart';
 import 'package:hey_dentist/VisualizeAppointment/BLoC/VisualizeAppointmentBloc.dart';
 import 'package:hey_dentist/VisualizeAppointment/BLoC/VisualizeAppointmentState.dart';
-
-import '../../Components/CustomText.dart';
+import '../../Helpers/BusinessLogic/Duration.dart';
+import '../../Helpers/Components/CustomText.dart';
 import '../BLoC/VisualizeAppointmentEvent.dart';
+import 'package:table_calendar/table_calendar.dart';
 
-class VisualizeAppointment extends StatelessWidget {
-  final customText = CustomText();
-  final layoutConstrains = VisualizeAppointmentLayoutConstrains();
+class VisualizeAppointment extends StatefulWidget {
   final UserModel user;
   final BuildContext context;
-  List<Appointment> appointmentList = [];
-  List<String> hourList = HourList().getHourList();
+  final DateTimeBusinessLogic dateTimeBusinessLogic;
 
-  VisualizeAppointment({Key? key, required this.user, required this.context})
+  VisualizeAppointment(
+      {Key? key,
+      required this.user,
+      required this.context,
+      required this.dateTimeBusinessLogic})
       : super(key: key) {
     BlocProvider.of<VisualizeAppointmentBloc>(context).add(
-        VisualizeAppointmentSelectDateEvent(
+        VisualizeAppointmentFetchAppointmentEvent(
             datetime: DateTime.now(), user: user));
   }
+
+  @override
+  State<VisualizeAppointment> createState() => _VisualizeAppointmentState();
+}
+
+class _VisualizeAppointmentState extends State<VisualizeAppointment> {
+  final customText = CustomText();
+
+  final layoutConstrains = VisualizeAppointmentLayoutConstrains();
+
+  final durationBusinessLogic = DurationBusinessLogic();
+
+  List<Appointment> appointmentList = [];
+
+  List<String> hourList = HourList().getHourList();
+  DateTime focusedDay = DateTime.now();
+  DateTime currentDay = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -33,15 +53,64 @@ class VisualizeAppointment extends StatelessWidget {
               BlocBuilder<VisualizeAppointmentBloc, VisualizeAppointmentState>(
             builder: (context, state) {
               switch (state.runtimeType) {
+                case VisualizeAppointmentCalendarOpenedState:
+                  return SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SizedBox(
+                          height: layoutConstrains.calendarHeight,
+                          width: layoutConstrains.calendarWidth,
+                          child: TableCalendar(
+                            currentDay: currentDay,
+                            headerVisible: false,
+                            firstDay: DateTime(DateTime.now().year, 1),
+                            lastDay: DateTime(DateTime.now().year, 12),
+                            focusedDay: focusedDay,
+                            onDaySelected:
+                                (DateTime selectedDay, DateTime focusedDay) {
+                              BlocProvider.of<VisualizeAppointmentBloc>(context)
+                                  .add(
+                                      VisualizeAppointmentFetchAppointmentEvent(
+                                          datetime: selectedDay,
+                                          user: widget.user));
+                              setState(() {
+                                this.focusedDay = focusedDay;
+                                currentDay = selectedDay;
+                              });
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                              itemCount: hourList.length,
+                              itemBuilder: _buildListViewItem),
+                        ),
+                      ],
+                    ),
+                  );
                 case VisualizeAppointmentFetchedAppointmentState:
                   final _castedState =
                       state as VisualizeAppointmentFetchedAppointmentState;
 
                   appointmentList = _castedState.appointmentList;
-
-                  return ListView.builder(
-                      itemCount: hourList.length,
-                      itemBuilder: _buildListViewItem);
+                  return SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: ListView.builder(
+                        itemCount: hourList.length,
+                        itemBuilder: _buildListViewItem),
+                  );
+                case VisualizeAppointmentCalendarClosedState:
+                  return SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: ListView.builder(
+                        itemCount: hourList.length,
+                        itemBuilder: _buildListViewItem),
+                  );
                 default:
                   return const Center(
                     child: CircularProgressIndicator(),
@@ -70,32 +139,63 @@ class VisualizeAppointment extends StatelessWidget {
                       fontWeight: FontWeight.w500);
                 default:
                   return customText.buildText(
-                      label: '',
+                      label:
+                          '${currentDay.day} ${widget.dateTimeBusinessLogic.getNamedMonth(focusedDay.month)}',
                       color: Colors.white,
                       fontSize: 20,
                       fontWeight: FontWeight.w500);
               }
             },
           ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.keyboard_arrow_down,
-              size: layoutConstrains.iconSize,
-            ),
+          BlocBuilder<VisualizeAppointmentBloc, VisualizeAppointmentState>(
+            builder: (_, state) {
+              return mapStateToAppBarTitle(state);
+            },
           )
         ],
       ),
     );
   }
 
+  IconButton mapStateToAppBarTitle(VisualizeAppointmentState state) {
+    switch (state.runtimeType) {
+      case VisualizeAppointmentCalendarOpenedState:
+        final _castedState = state as VisualizeAppointmentCalendarOpenedState;
+        return IconButton(
+          onPressed: () {
+            BlocProvider.of<VisualizeAppointmentBloc>(widget.context).add(
+                VisualizeAppointmentManageCalendarEvent(
+                    isOpen: _castedState.isOpen));
+          },
+          icon: Icon(
+            _castedState.isOpen
+                ? Icons.keyboard_arrow_up
+                : Icons.keyboard_arrow_down,
+            size: layoutConstrains.iconSize,
+          ),
+        );
+      default:
+        return IconButton(
+          onPressed: () {
+            BlocProvider.of<VisualizeAppointmentBloc>(widget.context)
+                .add(VisualizeAppointmentManageCalendarEvent(isOpen: false));
+          },
+          icon: Icon(
+            Icons.keyboard_arrow_down,
+            size: layoutConstrains.iconSize,
+          ),
+        );
+    }
+  }
+
   Widget _buildListViewItem(BuildContext context, int index) {
     Appointment appointment = appointmentList.firstWhere(
         (Appointment appointment) {
-      return (getAppointmentDuration(
+      return (durationBusinessLogic.getAppointmentDuration(
                   appointment.initialHour, hourList[index]) >=
               const Duration(hours: 0, minutes: 0) &&
-          getAppointmentDuration(hourList[index], appointment.endHour) >=
+          durationBusinessLogic.getAppointmentDuration(
+                  hourList[index], appointment.endHour) >
               const Duration(hours: 0, minutes: 0));
     },
         orElse: () => Appointment(
@@ -133,7 +233,7 @@ class VisualizeAppointment extends StatelessWidget {
                   EdgeInsets.only(left: layoutConstrains.labelsToCardPadding),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   customText.buildText(
                       label: appointment.pacientName,
@@ -157,22 +257,6 @@ class VisualizeAppointment extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Duration getAppointmentDuration(String initialHour, String endHour) {
-    int intInitialHour = int.parse(initialHour.split(":")[0]);
-    int intInitialMinute = int.parse(initialHour.split(":")[1]);
-    int intEndHour = int.parse(endHour.split(":")[0]);
-    int intEndMinute = int.parse(endHour.split(":")[1]);
-
-    Duration initialHourDuration =
-        Duration(hours: intInitialHour, minutes: intInitialMinute);
-
-    Duration endHourDuration =
-        Duration(hours: intEndHour, minutes: intEndMinute);
-
-    Duration result = endHourDuration - initialHourDuration;
-    return result;
   }
 }
 
@@ -223,5 +307,7 @@ class VisualizeAppointmentLayoutConstrains {
       cardsWidth = 290.0,
       cardsHeight = 75.0,
       cardsBorderWidth = 2.5,
-      cardsBorderRadius = 10;
+      cardsBorderRadius = 10,
+      calendarHeight = 280,
+      calendarWidth = 415;
 }

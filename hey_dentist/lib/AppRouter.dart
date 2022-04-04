@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hey_dentist/Data/Dentist/UserModel.dart';
+import 'package:hey_dentist/Helpers/BusinessLogic/DateTime.dart';
 import 'package:hey_dentist/Login/View/LoginView.dart';
 import 'package:hey_dentist/Register/View/RegisterView.dart';
 import 'package:hey_dentist/RegisterAppointment/View/RegisterAppointmentView.dart';
@@ -43,7 +44,7 @@ class AppRouter {
         final user = argumentsMap['user'];
         final context = argumentsMap['context'];
         return MaterialPageRoute(
-            builder: (_) => VisualizeAppointment(user: user, context: context,));
+            builder: (_) => VisualizeAppointment(user: user, context: context, dateTimeBusinessLogic: DateTimeBusinessLogic(),));
 
       default:
         return null;

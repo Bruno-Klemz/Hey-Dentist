@@ -4,6 +4,8 @@ import 'package:hey_dentist/Data/Appointment/AppointmentAPI.dart';
 import 'package:hey_dentist/Data/Appointment/AppointmentRepository.dart';
 import 'package:hey_dentist/Data/Dentist/UserAPI.dart';
 import 'package:hey_dentist/Data/Dentist/UserRepository.dart';
+import 'package:hey_dentist/Helpers/BusinessLogic/DateTime.dart';
+import 'package:hey_dentist/Helpers/BusinessLogic/Duration.dart';
 import 'package:hey_dentist/Login/BLoC/LoginBloc.dart';
 import 'package:hey_dentist/Login/BLoC/LoginState.dart';
 import 'package:hey_dentist/Login/Navigator/LoginNavigator.dart';
@@ -52,11 +54,11 @@ class AppBlocProvider {
           create: (BuildContext context) => RegisterAppointmentBloc(
               RegisterAppointmentInitialState(),
               RegisterAppointmentNavigator(),
-              AppointmentRepository(api: AppointmentAPI()))),
+              AppointmentRepository(api: AppointmentAPI()), DurationBusinessLogic())),
 
       BlocProvider<VisualizeAppointmentBloc>(
           create: (BuildContext context) =>
-              VisualizeAppointmentBloc(VisualizeAppointmentInitialState())),
+              VisualizeAppointmentBloc(VisualizeAppointmentInitialState(), DateTimeBusinessLogic())),
     ];
     return blocProviderList;
   }
